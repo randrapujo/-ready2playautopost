@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ready2Play AutoPost — Callback</title>
+<style>
+ :root{--bg:#0e0d12;--card:#17151d;--fg:#f4f2ff;--muted:#a49fb8;--accent:#7c5cff;--border:#2a2733}
+ *{box-sizing:border-box}
+ body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh}
+ .wrap{max-width:640px;width:100%;padding:24px;margin:0 auto}
+ .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px;text-align:center}
+ h1{font-size:20px;margin:0 0 8px}
+ p{color:var(--muted);margin:0 0 20px}
+ .code{background:#0a090d;border:1px dashed var(--accent);border-radius:12px;padding:18px;font-family:ui-monospace,Consolas,monospace;font-size:14px;word-break:break-all;margin:0 0 18px;color:#c9c2ff}
+ button{background:var(--accent);border:0;color:#fff;font-size:15px;padding:12px 28px;border-radius:10px;cursor:pointer}
+ button:hover{filter:brightness(1.15)}
+ .err{color:#ff8a8a}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <div class="card">
+  <h1 id="title">Ready2Play AutoPost</h1>
+  <p id="msg">Checking the authorization result…</p>
+  <div class="code" id="codebox" style="display:none"></div>
+  <button id="copybtn" style="display:none" onclick="copycode()">Copy code</button>
+  <div id="hint" style="display:none;margin-top:16px;color:var(--muted);font-size:13px">
+    Paste the code above into the chat (Hermes) — it will be exchanged for the access token there.
+  </div>
+ </div>
+</div>
+<script>
+(function(){
+  var q=new URLSearchParams(location.search);
+  var code=q.get("code"), err=q.get("error");
+  var msg=document.getElementById("msg"),
+      box=document.getElementById("codebox"),
+      btn=document.getElementById("copybtn"),
+      hint=document.getElementById("hint"),
+      title=document.getElementById("title");
+  if(err){
+    title.textContent="Authorization failed";
+    msg.className="err";
+    msg.textContent="TikTok returned an error: "+err+" "+(q.get("error_description")||"");
+    return;
+  }
+  if(code){
+    msg.textContent="Authorization successful. This is the one-time code (valid a few minutes):";
+    box.textContent=code;
+    box.style.display="block";
+    btn.style.display="inline-block";
+    hint.style.display="block";
+  }else{
+    title.textContent="Callback reached — but no code found";
+    msg.className="err";
+    msg.textContent="No 'code' parameter in the URL. Check the query string and retry from the developer portal.";
+  }
+})();
+function copycode(){
+  var t=document.getElementById("codebox").textContent;
+  if(navigator.clipboard){navigator.clipboard.writeText(t);document.getElementById("copybtn").textContent="Copied!";}
+}
+</script>
+</body>
+</html>
